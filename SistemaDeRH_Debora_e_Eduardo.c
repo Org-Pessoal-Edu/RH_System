@@ -13,23 +13,103 @@ struct T_no {
 T_no *arvoreCPF; //Criando um ponteiro para a raíz da árvore (inicia como NULL)
 
 //Função para inserir um funcionário
-void inserir( char *vetor, int cpf){
-//Falta implementar os métodos dessa função
+void inserir(char *vetor, int cpf){
+    T_no *novo = (T_no*)malloc(sizeof(T_no));
+    if (!novo) {
+        printf("Erro de alocação de memória.\n");
+        return;
+    }
+
+    novo->CPF = cpf;
+    strcpy(novo->Nome, vetor);
+    novo->esq = novo->dir = NULL;
+
+    if (arvoreCPF == NULL) {
+        arvoreCPF = novo;
+        return;
+    }
+
+    T_no *atual = arvoreCPF, *pai = NULL;
+    while (atual != NULL) {
+        pai = atual;
+        if (cpf == atual->CPF) {
+            printf("CPF já cadastrado!\n");
+            free(novo);
+            return;
+        } else if (cpf < atual->CPF) {
+            atual = atual->esq;
+        } else {
+            atual = atual->dir;
+        }
+    }
+
+    if (cpf < pai->CPF) pai->esq = novo;
+    else pai->dir = novo;
 }
 
 //Função para remover um funcionário através do CPF
+T_no* removerRec(T_no *raiz, int cpf){
+    if (raiz == NULL) {
+        printf("Funcionário com CPF %d não encontrado.\n", cpf);
+        return NULL;
+    }
+
+    if (cpf < raiz->CPF) {
+        raiz->esq = removerRec(raiz->esq, cpf);
+    } else if (cpf > raiz->CPF) {
+        raiz->dir = removerRec(raiz->dir, cpf);
+    } else {
+        // Encontrado
+        if (raiz->esq == NULL) {
+            T_no *temp = raiz->dir;
+            free(raiz);
+            return temp;
+        } else if (raiz->dir == NULL) {
+            T_no *temp = raiz->esq;
+            free(raiz);
+            return temp;
+        } else {
+            // Dois filhos: encontrar o menor da subárvore direita
+            T_no *temp = raiz->dir;
+            while (temp->esq != NULL) temp = temp->esq;
+            raiz->CPF = temp->CPF;
+            strcpy(raiz->Nome, temp->Nome);
+            raiz->dir = removerRec(raiz->dir, temp->CPF);
+        }
+    }
+    return raiz;
+}
+
 void remover(int cpf){
-//Falta implementar os métodos dessa função
+    arvoreCPF = removerRec(arvoreCPF, cpf);
 }
 
 //Função para buscar um funcionário através do CPF
 void buscar(int cpf){
-//Falta implementar os métodos dessa função
+    T_no *atual = arvoreCPF;
+    while (atual != NULL) {
+        if (cpf == atual->CPF) {
+            printf("Funcionário encontrado:\nNome: %s\nCPF: %d\n", atual->Nome, atual->CPF);
+            return;
+        } else if (cpf < atual->CPF) {
+            atual = atual->esq;
+        } else {
+            atual = atual->dir;
+        }
+    }
+    printf("Funcionário com CPF %d não encontrado.\n", cpf);
 }
 
 //Função para listar funcionários em ordem crescente de CPF
+void listarRec(T_no *raiz) {
+    if (raiz == NULL) return;
+    listarRec(raiz->esq);
+    printf("Nome: %s | CPF: %d\n", raiz->Nome, raiz->CPF);
+    listarRec(raiz->dir);
+}
+
 void listar(){
-//Falta implementar os métodos dessa função
+    listarRec(arvoreCPF);
 }
 
 void limparTela(){
