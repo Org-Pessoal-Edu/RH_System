@@ -1,0 +1,78 @@
+    INTRODUÇÃO
+
+Você é o responsável pela implementação do sistema de RH de uma empresa. Serão feitas
+muitas consultas ao sistema por CPF e deseja-se que todas as consultas sejam realizadas
+de forma rápida. Faça um programa que permita o cadastro, a remoção e a consulta de
+funcionários.
+Utilize estruturas de dados do tipo Árvore Binária de Busca para armazenar e organizar os
+dados dos funcionários. Será necessária uma árvore ordenada por CPF. Utilize a estrutura
+abaixo:
+
+typedef struct T_no T_no;
+struct T_no {
+ int CPF;
+ char Nome[50];
+ T_no *esq, *dir;
+};
+T_no *arvoreCPF;
+
+Ao final do programa, libere todos os endereços de memória alocados.
+
+    ENTRADA E SAÍDA
+
+O programa deverá exibir um menu para receber os seguintes comandos pelo teclado:
+
+1) Inserir: (2 pontos)
+    i <nome>;<CPF>
+    (se a dupla preferir, poderá ser implementado com uma pergunta para cada campo)
+    Insere o funcionário na árvore ordenada por CPF.
+    Imprime “Inseriu <nome>”
+    Observação: o programa não deve permitir o cadastro de um CPF em duplicidade.
+2) Remover por CPF: (3 pontos)
+    r <CPF>
+    Remove o funcionário da árvore e libera a memória do nó. Imprime
+    “Removeu <nome> <CPF>”
+3) Buscar por CPF: (3 pontos)
+    b <CPF>
+    Busca o funcionário na árvore ordenada por CPF e imprime:
+    Encontrou: <Nome> <CPF>, se funcionário encontrado.
+    CPF <CPF> não localizado, se funcionário não encontrado.
+4) Listar (1 ponto)
+    l (lista clientes na ordem de CPF)
+    (o primeiro caractere é um L minúsculo)
+5) Sair do programa após desalocar endereços de memória: (1 ponto)
+    s
+
+Exemplo do programa em execução:
+    i Jorge;1234
+    i Ana 3311
+    i Laura 133
+    i Pedro 1
+    b 1234
+    r 3311
+    b 3311
+    b 133
+    s
+Exemplo da saída padrão (monitor):
+    Inseriu Jorge
+    Inseriu Ana
+    Inseriu Laura
+    Inseriu Pedro
+    Encontrou: Jorge 1234
+    Removeu Ana 3311
+    CPF 3311 não localizado
+    Encontrou: Laura 133
+
+    OUTRAS INFORMAÇÕES IMPORTANTES
+
+. O trabalho poderá ser feito individualmente ou em dupla.
+· O programa deve ser feito em linguagem C. Não serão aceitos arquivos em C++ ou
+com extensão .cpp.
+· Todas as submissões são checadas para evitar cópia/plágio/etc.
+· Comente o seu código com uma explicação rápida do que cada função, método ou trecho
+importante de código faz (ou deveria fazer). Comentários valem nota. (até 25% do item)
+. A modularização do código vale nota. Quando quiser repetir um trecho de código, resista à
+tentação do Ctrl-C/Ctrl-V. Em vez disso, crie uma função com parâmetros adequados. (até
+50% do item).
+Crédito: Este trabalho foi adaptado do original da Profª Maria Cristina Ferreira de Oliveira,
+do ICMC - USP - São Carlos.
