@@ -13,15 +13,15 @@ struct T_no {
 T_no *arvoreCPF; //Criando um ponteiro para a raíz da árvore (inicia como NULL)
 
 //Função para inserir um funcionário
-void inserir(char *vetor, int cpf){
+void inserir( char *nome, int cpf){
     T_no *novo = (T_no*)malloc(sizeof(T_no));
     if (!novo) {
-        printf("Erro de alocação de memória.\n");
+        printf("Erro de alocacao de memoria.\n");
         return;
     }
 
     novo->CPF = cpf;
-    strcpy(novo->Nome, vetor);
+    strcpy(novo->Nome, nome);
     novo->esq = novo->dir = NULL;
 
     if (arvoreCPF == NULL) {
@@ -33,7 +33,7 @@ void inserir(char *vetor, int cpf){
     while (atual != NULL) {
         pai = atual;
         if (cpf == atual->CPF) {
-            printf("CPF já cadastrado!\n");
+            printf("CPF ja cadastrado!\n");
             free(novo);
             return;
         } else if (cpf < atual->CPF) {
@@ -48,25 +48,30 @@ void inserir(char *vetor, int cpf){
 }
 
 //Função para remover um funcionário através do CPF
-T_no* removerRec(T_no *raiz, int cpf){
+T_no* remover(T_no *raiz, int cpf){
     if (raiz == NULL) {
-        printf("Funcionário com CPF %d não encontrado.\n", cpf);
+        printf("CPF %d nao localizado.\n", cpf);
         return NULL;
     }
 
     if (cpf < raiz->CPF) {
-        raiz->esq = removerRec(raiz->esq, cpf);
+        raiz->esq = remover(raiz->esq, cpf);
     } else if (cpf > raiz->CPF) {
-        raiz->dir = removerRec(raiz->dir, cpf);
+        raiz->dir = remover(raiz->dir, cpf);
     } else {
         // Encontrado
+        char nomeRemovido[50];
+        strcpy(nomeRemovido, raiz->Nome);
+
         if (raiz->esq == NULL) {
             T_no *temp = raiz->dir;
             free(raiz);
+            printf("Removeu %s %d\n", nomeRemovido, cpf);
             return temp;
         } else if (raiz->dir == NULL) {
             T_no *temp = raiz->esq;
             free(raiz);
+            printf("Removeu %s %d\n", nomeRemovido, cpf);
             return temp;
         } else {
             // Dois filhos: encontrar o menor da subárvore direita
@@ -74,14 +79,10 @@ T_no* removerRec(T_no *raiz, int cpf){
             while (temp->esq != NULL) temp = temp->esq;
             raiz->CPF = temp->CPF;
             strcpy(raiz->Nome, temp->Nome);
-            raiz->dir = removerRec(raiz->dir, temp->CPF);
+            raiz->dir = remover(raiz->dir, temp->CPF);
         }
     }
     return raiz;
-}
-
-void remover(int cpf){
-    arvoreCPF = removerRec(arvoreCPF, cpf);
 }
 
 //Função para buscar um funcionário através do CPF
@@ -89,7 +90,7 @@ void buscar(int cpf){
     T_no *atual = arvoreCPF;
     while (atual != NULL) {
         if (cpf == atual->CPF) {
-            printf("Funcionário encontrado:\nNome: %s\nCPF: %d\n", atual->Nome, atual->CPF);
+            printf("Encontrou: %s %d\n", atual->Nome, atual->CPF);
             return;
         } else if (cpf < atual->CPF) {
             atual = atual->esq;
@@ -97,21 +98,27 @@ void buscar(int cpf){
             atual = atual->dir;
         }
     }
-    printf("Funcionário com CPF %d não encontrado.\n", cpf);
+    printf("CPF %d nao localizado.\n", cpf);
 }
 
 //Função para listar funcionários em ordem crescente de CPF
-void listarRec(T_no *raiz) {
+void listar(T_no *raiz){
     if (raiz == NULL) return;
-    listarRec(raiz->esq);
+    listar(raiz->esq);
     printf("Nome: %s | CPF: %d\n", raiz->Nome, raiz->CPF);
-    listarRec(raiz->dir);
+    listar(raiz->dir);
 }
 
-void listar(){
-    listarRec(arvoreCPF);
+//Função para limpar os nós de uma árvore binária
+void liberar(T_no *raiz) {
+    if (raiz == NULL) return;
+    liberar(raiz->esq);
+    liberar(raiz->dir);
+    free(raiz);
 }
 
+//Função que utiliza comandos do próprio terminal do S.O. para limpar o terminal
+//Tirando a poluição da tela
 void limparTela(){
     #ifdef _WIN32
         system("cls");
@@ -132,9 +139,9 @@ void sget( char* vetor, int tam){
 
 //Função para padronizar todas as letras de input do usuário minúsculas (facilitando comparações)
 //Utiliza a biblioteca <ctype.h>
-void padronizarLetras( char *vetor){
-    for( int i = 0; vetor[i] != '\0' && vetor[i]; ++i){
-        vetor[i] = tolower(vetor[i]); //tolower deixa o caractere minúsculo
+void padronizarLetras( char *opcao){
+    for( int i = 0; opcao[i] != '\0' && opcao[i]; ++i){
+        opcao[i] = tolower(opcao[i]); //tolower deixa o caractere minúsculo
     }
 }
 
@@ -164,30 +171,31 @@ int menu(){
     //Verifica se é a função inserir (strcmp retornará 0 se sim)
     if(strcmp(opcao, "inserir") == 0){
         printf("\nInsira o nome do funcionario: ");
-        sget(nome, tamNome);
+        sget( nome, tamNome);
         printf("\nInsira o CPF do funcionario: ");
         scanf("%d", &cpf);
         fflush(stdin);
         inserir(nome, cpf);
+        printf("Inseriu %s\n", nome);
     }
     //Verifica se é a função remover (strcmp retornará 0 se sim)
     else if(strcmp(opcao, "remover") == 0){
         printf("\nInsira o CPF do funcionario: ");
         scanf("%d", &cpf);
         fflush(stdin);
-        //remover(cpf);
+        arvoreCPF = remover(arvoreCPF, cpf);
     }
     //Verifica se é a função buscar (strcmp retornará 0 se sim)
     else if(strcmp(opcao, "buscar") == 0){
         printf("\nInsira o CPF do funcionario: ");
         scanf("%d", &cpf);
         fflush(stdin);
-        //buscar(cpf);
+        buscar(cpf);
     }
     //Verifica se é a função listar (strcmp retornará 0 se sim)
     else if(strcmp(opcao, "listar") == 0){
         printf("\nClientes em ordem de CPF:\n");
-        //listar();
+        listar(arvoreCPF);
     }
     //Verifica se quer sair (strcmp retornará 0 se sim)
     else if(strcmp(opcao, "sair") == 0){
@@ -195,7 +203,7 @@ int menu(){
     }
 
     else{ //Caso digite algo diferente
-        printf("Opcao Invalida! Digite apenas umas das opcoes..."); 
+        printf("Opcao Invalida! Digite apenas umas das opcoes...\n"); 
     }
 
     printf("\nPressione Enter para continuar..."); //Já que a tela será limpa, deixei uma confirmação antes
@@ -206,5 +214,8 @@ int menu(){
 //Criei uma função para o menu para modularizar o código e abrir espaço para futuras melhorias
 int main(void){
     while(menu() != 0); //O próprio while chama o menu(), então não precisa criar o corpo da função {}
+    liberar(arvoreCPF);
+    arvoreCPF = NULL;
+    printf("Memoria liberada, saindo...\n");
     return 0;
 }
